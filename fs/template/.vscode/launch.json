@@ -13,6 +13,8 @@
                 "--device=${env:HOME}/ddriver",
                 "-f",
                 "-d",
+                "-o",
+                "use_ino",
                 "${workspaceFolder}/tests/mnt"
             ],
             "stopAtEntry": false,
