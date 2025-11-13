@@ -1,0 +1,7 @@
+{
+    "cmake.generator": "Unix Makefiles",
+    "cmake.sourceDirectory": "/home/chihayaanon/user-land-filesystem/fs/newfs",
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": ".cmake/toolchain-wsl.cmake"
+    }
+}

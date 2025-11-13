@@ -1,0 +1,1 @@
+/usr/bin/gcc  -D_FILE_OFFSET_BITS=64 -no-pie -g -Wall --pedantic -g CMakeFiles/demo.dir/src/main.c.o -o demo  /usr/lib/x86_64-linux-gnu/libfuse.so /home/chihayaanon/lib/libddriver.a 

@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/chihayaanon/user-land-filesystem/fs/simplefs/build",
+  "command": "/usr/bin/gcc  -I/home/chihayaanon/user-land-filesystem/fs/simplefs/./include  -D_FILE_OFFSET_BITS=64 -no-pie -g -Wall --pedantic -g -o CMakeFiles/sfs-fuse.dir/src/sfs.c.o -c /home/chihayaanon/user-land-filesystem/fs/simplefs/src/sfs.c",
+  "file": "/home/chihayaanon/user-land-filesystem/fs/simplefs/src/sfs.c",
+  "output": "CMakeFiles/sfs-fuse.dir/src/sfs.c.o"
+},
+{
+  "directory": "/home/chihayaanon/user-land-filesystem/fs/simplefs/build",
+  "command": "/usr/bin/gcc  -I/home/chihayaanon/user-land-filesystem/fs/simplefs/./include  -D_FILE_OFFSET_BITS=64 -no-pie -g -Wall --pedantic -g -o CMakeFiles/sfs-fuse.dir/src/sfs_debug.c.o -c /home/chihayaanon/user-land-filesystem/fs/simplefs/src/sfs_debug.c",
+  "file": "/home/chihayaanon/user-land-filesystem/fs/simplefs/src/sfs_debug.c",
+  "output": "CMakeFiles/sfs-fuse.dir/src/sfs_debug.c.o"
+},
+{
+  "directory": "/home/chihayaanon/user-land-filesystem/fs/simplefs/build",
+  "command": "/usr/bin/gcc  -I/home/chihayaanon/user-land-filesystem/fs/simplefs/./include  -D_FILE_OFFSET_BITS=64 -no-pie -g -Wall --pedantic -g -o CMakeFiles/sfs-fuse.dir/src/sfs_utils.c.o -c /home/chihayaanon/user-land-filesystem/fs/simplefs/src/sfs_utils.c",
+  "file": "/home/chihayaanon/user-land-filesystem/fs/simplefs/src/sfs_utils.c",
+  "output": "CMakeFiles/sfs-fuse.dir/src/sfs_utils.c.o"
+}
+]

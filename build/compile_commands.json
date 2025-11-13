@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/chihayaanon/user-land-filesystem/build",
+  "command": "/usr/bin/gcc  -I/home/chihayaanon/user-land-filesystem/fs/demo/./include  -D_FILE_OFFSET_BITS=64 -no-pie -g -Wall --pedantic -g -o CMakeFiles/demo.dir/src/main.c.o -c /home/chihayaanon/user-land-filesystem/fs/demo/src/main.c",
+  "file": "/home/chihayaanon/user-land-filesystem/fs/demo/src/main.c",
+  "output": "CMakeFiles/demo.dir/src/main.c.o"
+}
+]

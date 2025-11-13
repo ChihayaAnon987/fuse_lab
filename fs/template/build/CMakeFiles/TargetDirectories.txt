@@ -1,0 +1,3 @@
+/home/chihayaanon/user-land-filesystem/fs/template/build/CMakeFiles/PROJECT_NAME.dir
+/home/chihayaanon/user-land-filesystem/fs/template/build/CMakeFiles/edit_cache.dir
+/home/chihayaanon/user-land-filesystem/fs/template/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,9 @@
+[
+  {
+    "name": "WSL GCC",
+    "environmentVariables": {
+      "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    },
+    "toolchainFile": "${workspaceFolder}/.cmake/toolchain-wsl.cmake"
+  }
+]

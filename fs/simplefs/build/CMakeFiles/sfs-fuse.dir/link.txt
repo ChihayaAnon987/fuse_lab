@@ -1,0 +1,1 @@
+/usr/bin/gcc  -D_FILE_OFFSET_BITS=64 -no-pie -g -Wall --pedantic -g "CMakeFiles/sfs-fuse.dir/src/sfs.c.o" "CMakeFiles/sfs-fuse.dir/src/sfs_debug.c.o" "CMakeFiles/sfs-fuse.dir/src/sfs_utils.c.o" -o sfs-fuse  /usr/lib/x86_64-linux-gnu/libfuse.so /home/chihayaanon/lib/libddriver.a 
