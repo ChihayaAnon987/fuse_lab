@@ -126,7 +126,7 @@ int newfs_getattr(const char* path, struct stat * newfs_stat) {
 	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
 	
 	// 目录不存在
-	if (is_find == FALSE) {
+	if (!is_find) {
 		return -NFS_ERROR_NOTFOUND;
 	}
 
@@ -139,19 +139,19 @@ int newfs_getattr(const char* path, struct stat * newfs_stat) {
 		newfs_stat->st_size = dentry->inode->size;
 	}
 
-	newfs_stat->st_nlink = 1;
-	newfs_stat->st_uid 	 = getuid();
-	newfs_stat->st_gid 	 = getgid();
-	newfs_stat->st_atime   = time(NULL);
-	newfs_stat->st_mtime   = time(NULL);
-	newfs_stat->st_blksize = NFS_IO_SZ();
-	newfs_stat->st_blocks  = NFS_DATA_PER_FILE;
+	newfs_stat->st_nlink = 1;					// 硬链接数，普通文件为1
+	newfs_stat->st_uid 	 = getuid();			// 文件所有者ID，使用当前用户ID
+	newfs_stat->st_gid 	 = getgid();			// 文件组ID，使用当前组ID
+	newfs_stat->st_atime   = time(NULL);		// 最后访问时间，设置为当前时间
+	newfs_stat->st_mtime   = time(NULL);		// 最后修改时间，设置为当前时间
+	newfs_stat->st_blksize = NFS_IO_SZ();		// 文件系统I/O块大小
+	newfs_stat->st_blocks  = NFS_DATA_PER_FILE;	// 一个文件的数据块数
 
 
 	// 判断是否为根目录
 	if (is_root) {
-		newfs_stat->st_size	= nfs_super.sz_usage; 
-		newfs_stat->st_blocks = NFS_DISK_SZ() / NFS_IO_SZ();
+		newfs_stat->st_size	= nfs_super.sz_usage;  				// 文件大小，设置为已使用的磁盘大小
+		newfs_stat->st_blocks = NFS_DISK_SZ() / NFS_IO_SZ();	// 设置为整个磁盘大小按IO大小划分的块数
 		newfs_stat->st_nlink  = 2;		/* !特殊，根目录link数为2 */
 	}
 	return NFS_ERROR_NONE;
@@ -215,7 +215,7 @@ int newfs_mknod(const char* path, mode_t mode, dev_t dev) {
 	struct nfs_inode* inode;
 	char* fname;
 	
-	if (is_find == TRUE) {
+	if (is_find) {
 		return -NFS_ERROR_EXISTS;
 	}
 
@@ -226,8 +226,7 @@ int newfs_mknod(const char* path, mode_t mode, dev_t dev) {
 	}
 	else if (S_ISDIR(mode)) {
 		dentry = new_dentry(fname, NFS_DIR);
-	}
-	else {
+	} else {
 		dentry = new_dentry(fname, NFS_FILE);
 	}
 	dentry->parent = last_dentry;

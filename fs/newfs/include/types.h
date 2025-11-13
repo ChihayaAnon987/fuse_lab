@@ -19,7 +19,7 @@ typedef enum nfs_file_type {
 #define UINT32_BITS             32
 #define UINT8_BITS              8
 
-#define NFS_MAGIC_NUM           0x52415453  
+#define NFS_MAGIC_NUM           0x20483246  
 #define NFS_SUPER_OFS           0
 #define NFS_ROOT_INO            0
 

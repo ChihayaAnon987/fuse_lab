@@ -506,7 +506,6 @@ struct nfs_dentry* nfs_lookup(const char * path, boolean* is_find, boolean* is_r
 int nfs_mount(struct custom_options options){
 
     // TODO
-    //相比sfs主要修改的点在于逻辑块才是数据块，以及多了数据位图和逻辑位图
     int                 ret = NFS_ERROR_NONE;
     int                 driver_fd;
     struct nfs_super_d  nfs_super_d; 
@@ -544,16 +543,14 @@ int nfs_mount(struct custom_options options){
         return -NFS_ERROR_IO;
     }  
 
-    if (nfs_super_d.magic_num != NFS_MAGIC_NUM) {     /* 幻数不正确，为第一次挂载 */
-        
-
+    // 若幻数不匹配，说明是第一次挂载，需要初始化文件系统
+    if (nfs_super_d.magic_num != NFS_MAGIC_NUM) {     
         // 初始化super_d的布局结构
         super_blks          = NFS_SUPER_BLKS;
         inode_num           = NFS_INODE_BLKS;
         data_num            = NFS_DATA_BLKS;
         map_inode_blks      = NFS_MAP_INODE_BLKS;
         map_data_blks       = NFS_MAP_DATA_BLKS;
-
 
         nfs_super.max_ino               = inode_num;
         nfs_super.max_dno               = data_num;
@@ -563,7 +560,6 @@ int nfs_mount(struct custom_options options){
         nfs_super_d.map_data_offset     = nfs_super_d.map_inode_offset + NFS_BLKS_SZ(map_inode_blks);
         nfs_super_d.inode_offset        = nfs_super_d.map_data_offset + NFS_BLKS_SZ(map_data_blks);
         nfs_super_d.data_offset         = nfs_super_d.inode_offset + NFS_BLKS_SZ(inode_num);
-
 
         nfs_super_d.sz_usage            = 0;
         nfs_super_d.magic_num           = NFS_MAGIC_NUM;
@@ -583,6 +579,7 @@ int nfs_mount(struct custom_options options){
     nfs_super.map_data_offset = nfs_super_d.map_data_offset;
     nfs_super.data_offset = nfs_super_d.data_offset;
 
+    // 从磁盘读取inode位图和数据块位图到内存中
     if (nfs_driver_read(nfs_super_d.map_inode_offset, (uint8_t *)(nfs_super.map_inode), 
                         NFS_BLKS_SZ(nfs_super_d.map_inode_blks)) != NFS_ERROR_NONE) {
         return -NFS_ERROR_IO;
@@ -593,7 +590,8 @@ int nfs_mount(struct custom_options options){
         return -NFS_ERROR_IO;
     }
 
-    if (is_init) {                                    /* 分配根节点 */
+    // 如果是首次挂载，为根目录分配inode并同步到磁盘。
+    if (is_init) {
         root_inode = nfs_alloc_inode(root_dentry);
         nfs_sync_inode(root_inode);
     }
@@ -612,18 +610,18 @@ int nfs_mount(struct custom_options options){
  */
 int nfs_umount() {
     // TODO
-    // 相比sfs也只是多加了数据位图相关操作
-    
-    
+    // 在 sfs 的基础上增加了数据位图相关操作
     struct nfs_super_d  nfs_super_d; 
 
+    // 如果没有挂载，则直接返回成功
     if (!nfs_super.is_mounted) {
         return NFS_ERROR_NONE;
     }
 
     // 刷回索引及其指向的data
     nfs_sync_inode(nfs_super.root_dentry->inode);     /* 从根节点向下刷写节点 */
-                                                    
+    
+    // 将内存中的超级块信息复制到磁盘超级块结构体中，准备写入磁盘
     nfs_super_d.magic_num           = NFS_MAGIC_NUM;
     nfs_super_d.sz_usage            = nfs_super.sz_usage;
 
@@ -636,21 +634,25 @@ int nfs_umount() {
     nfs_super_d.map_data_offset     = nfs_super.map_data_offset;
     nfs_super_d.data_offset         = nfs_super.data_offset;
 
+    // 将更新后的超级块信息写入磁盘的第一个块
     if (nfs_driver_write(NFS_SUPER_OFS, (uint8_t *)&nfs_super_d, 
                      sizeof(struct nfs_super_d)) != NFS_ERROR_NONE) {
         return -NFS_ERROR_IO;
     }
 
+    // 将内存中的inode位图写回到磁盘上对应的区域
     if (nfs_driver_write(nfs_super_d.map_inode_offset, (uint8_t *)(nfs_super.map_inode), 
                          NFS_BLKS_SZ(nfs_super_d.map_inode_blks)) != NFS_ERROR_NONE) {
         return -NFS_ERROR_IO;
     }
 
+    // 将内存中的数据块位图写回到磁盘上对应的区域
     if (nfs_driver_write(nfs_super_d.map_data_offset, (uint8_t *)(nfs_super.map_data), 
                          NFS_BLKS_SZ(nfs_super_d.map_data_blks)) != NFS_ERROR_NONE) {
         return -NFS_ERROR_IO;
     }
 
+    // 释放之前分配的位图内存，并关闭设备驱动程序
     free(nfs_super.map_inode);
     free(nfs_super.map_data);
     ddriver_close(NFS_DRIVER());
