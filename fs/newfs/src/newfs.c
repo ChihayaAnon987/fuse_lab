@@ -51,16 +51,11 @@ static struct fuse_operations operations = {
  */
 void* newfs_init(struct fuse_conn_info * conn_info) {
 	/* TODO: 在这里进行挂载 */
-
-	// 与sys中对应部分只改了名字
 	if(nfs_mount(nfs_options) != NFS_ERROR_NONE){
 		NFS_DBG("[%s] mount error\n", __func__);
 		fuse_exit(fuse_get_context()->fuse);
 		return NULL;
 	}
-	
-	/* 下面是一个控制设备的示例 */
-	// super.fd = ddriver_open(nfs_options.device);
 	
 	return NULL;
 }
@@ -73,17 +68,12 @@ void* newfs_init(struct fuse_conn_info * conn_info) {
  */
 void newfs_destroy(void* p) {
 	/* TODO: 在这里进行卸载 */
-	
-	// 与sys中对应部分只改了名字
-
 	if (nfs_umount() != NFS_ERROR_NONE) {
 		NFS_DBG("[%s] unmount error\n", __func__);
 		fuse_exit(fuse_get_context()->fuse);
 		return;
 	}
 	return;
-	
-	// ddriver_close(super.fd);
 
 }
 
@@ -96,10 +86,6 @@ void newfs_destroy(void* p) {
  */
 int newfs_mkdir(const char* path, mode_t mode) {
 	/* TODO: 解析路径，创建目录 */
-	
-	
-	// 与sys中对应部分只改了名字
-
 	(void)mode;
 	boolean is_find, is_root;
 	char* fname;
@@ -107,10 +93,12 @@ int newfs_mkdir(const char* path, mode_t mode) {
 	struct nfs_dentry* dentry;
 	struct nfs_inode*  inode;
 
+	// 目录已存在
 	if (is_find) {
 		return -NFS_ERROR_EXISTS;
 	}
 
+	// 上级是普通文件，不能创建目录
 	if (NFS_IS_REG(last_dentry->inode)) {
 		return -NFS_ERROR_UNSUPPORTED;
 	}
@@ -134,10 +122,10 @@ int newfs_mkdir(const char* path, mode_t mode) {
  */
 int newfs_getattr(const char* path, struct stat * newfs_stat) {
 	/* TODO: 解析路径，获取Inode，填充newfs_stat，可参考/fs/simplefs/sfs.c的sfs_getattr()函数实现 */
-
-	
 	boolean	is_find, is_root;
 	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
+	
+	// 目录不存在
 	if (is_find == FALSE) {
 		return -NFS_ERROR_NOTFOUND;
 	}
@@ -190,8 +178,6 @@ int newfs_getattr(const char* path, struct stat * newfs_stat) {
 int newfs_readdir(const char * path, void * buf, fuse_fill_dir_t filler, off_t offset,
 			    		 struct fuse_file_info * fi) {
     /* TODO: 解析路径，获取目录的Inode，并读取目录项，利用filler填充到buf，可参考/fs/simplefs/sfs.c的sfs_readdir()函数实现 */
-
-	// 与sys中对应部分只改了名字
 	boolean	is_find, is_root;
 	int		cur_dir = offset;
 
@@ -278,27 +264,7 @@ int newfs_utimens(const char* path, const struct timespec tv[2]) {
 int newfs_write(const char* path, const char* buf, size_t size, off_t offset,
 		        struct fuse_file_info* fi) {
 	/* 选做 */
-	boolean	is_find, is_root;
-	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
-	struct nfs_inode*  inode;
-	
-	if (is_find == FALSE) {
-		return -NFS_ERROR_NOTFOUND;
-	}
-
-	inode = dentry->inode;
-	
-	if (NFS_IS_DIR(inode)) {
-		return -NFS_ERROR_ISDIR;	
-	}
-
-	if (NFS_BLKS_SZ(inode->size) < offset) {
-		return -NFS_ERROR_SEEK;
-	}
-
-	nfs_write_file(inode, buf, size, offset);
-
-	return size;
+	return 0;
 }
 
 /**
@@ -313,27 +279,8 @@ int newfs_write(const char* path, const char* buf, size_t size, off_t offset,
  */
 int newfs_read(const char* path, char* buf, size_t size, off_t offset,
 		       struct fuse_file_info* fi) {
-	/* 选做 */
-	boolean	is_find, is_root;
-	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
-	struct nfs_inode*  inode;
-
-	if (is_find == FALSE) {
-		return -NFS_ERROR_NOTFOUND;
-	}
-
-	inode = dentry->inode;
-	
-	if (NFS_IS_DIR(inode)) {
-		return -NFS_ERROR_ISDIR;	
-	}
-
-	if (NFS_BLKS_SZ(inode->size) < offset) {
-		return -NFS_ERROR_SEEK;
-	}
-
-	nfs_read_file(inode, buf, size, offset);
-	return size;
+	/* 选做 */;
+	return 0;
 }
 
 /**
@@ -344,19 +291,7 @@ int newfs_read(const char* path, char* buf, size_t size, off_t offset,
  */
 int newfs_unlink(const char* path) {
 	/* 选做 */
-	boolean	is_find, is_root;
-	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
-	struct nfs_inode*  inode;
-
-	if (is_find == FALSE) {
-		return -NFS_ERROR_NOTFOUND;
-	}
-
-	inode = dentry->inode;
-
-	nfs_drop_inode(inode);
-	nfs_drop_dentry(dentry->parent->inode, dentry);
-	return NFS_ERROR_NONE;
+	return 0;
 }
 
 /**
@@ -373,7 +308,7 @@ int newfs_unlink(const char* path) {
  */
 int newfs_rmdir(const char* path) {
 	/* 选做 */
-	return newfs_unlink(path);
+	return 0;
 }
 
 /**
@@ -385,41 +320,7 @@ int newfs_rmdir(const char* path) {
  */
 int newfs_rename(const char* from, const char* to) {
 	/* 选做 */
-	int ret = NFS_ERROR_NONE;
-	boolean	is_find, is_root;
-	struct nfs_dentry* from_dentry = nfs_lookup(from, &is_find, &is_root);
-	struct nfs_inode*  from_inode;
-	struct nfs_dentry* to_dentry;
-	mode_t mode = 0;
-	if (is_find == FALSE) {
-		return -NFS_ERROR_NOTFOUND;
-	}
-
-	if (strcmp(from, to) == 0) {
-		return NFS_ERROR_NONE;
-	}
-
-	from_inode = from_dentry->inode;
-	
-	if (NFS_IS_DIR(from_inode)) {
-		mode = S_IFDIR;
-	}
-	else if (NFS_IS_REG(from_inode)) {
-		mode = S_IFREG;
-	}
-	
-	ret = newfs_mknod(to, mode, NULL);
-	if (ret != NFS_ERROR_NONE) {					  /* 保证目的文件不存在 */
-		return ret;
-	}
-	
-	to_dentry = nfs_lookup(to, &is_find, &is_root);	  
-	nfs_drop_inode(to_dentry->inode);				  /* 保证生成的inode被释放 */	
-	to_dentry->ino = from_inode->ino;				  /* 指向新的inode */
-	to_dentry->inode = from_inode;
-	
-	nfs_drop_dentry(from_dentry->parent->inode, from_dentry);
-	return ret;
+	return 0;
 }
 
 /**
@@ -456,23 +357,6 @@ int newfs_opendir(const char* path, struct fuse_file_info* fi) {
  */
 int newfs_truncate(const char* path, off_t offset) {
 	/* 选做 */
-	boolean	is_find, is_root;
-	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
-	struct nfs_inode*  inode;
-	
-	if (is_find == FALSE) {
-		return -NFS_ERROR_NOTFOUND;
-	}
-	
-	inode = dentry->inode;
-
-	if (NFS_IS_DIR(inode)) {
-		return -NFS_ERROR_ISDIR;
-	}
-
-	nfs_write_file(inode, NULL, offset, 0);
-
-	return NFS_ERROR_NONE;
 	return 0;
 }
 
@@ -491,31 +375,7 @@ int newfs_truncate(const char* path, off_t offset) {
  */
 int newfs_access(const char* path, int type) {
 	/* 选做: 解析路径，判断是否存在 */
-	boolean	is_find, is_root;
-	boolean is_access_ok = FALSE;
-	struct nfs_dentry* dentry = nfs_lookup(path, &is_find, &is_root);
-	struct nfs_inode*  inode;
-
-	switch (type)
-	{
-	case R_OK:
-		is_access_ok = TRUE;
-		break;
-	case F_OK:
-		if (is_find) {
-			is_access_ok = TRUE;
-		}
-		break;
-	case W_OK:
-		is_access_ok = TRUE;
-		break;
-	case X_OK:
-		is_access_ok = TRUE;
-		break;
-	default:
-		break;
-	}
-	return is_access_ok ? NFS_ERROR_NONE : -NFS_ERROR_ACCESS;
+	return 0;
 }	
 /******************************************************************************
 * SECTION: FUSE入口
