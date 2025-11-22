@@ -64,7 +64,7 @@ typedef enum nfs_file_type {
 #define NFS_DISK_SZ()                   (nfs_super.sz_disk)
 #define NFS_DRIVER()                    (nfs_super.fd)
 #define NFS_DENTRY_PER_DATABLK()        (NFS_BLK_SZ() / sizeof(struct nfs_dentry))      //计算一个逻辑块可以储存多少dentry
-#define NFS_BLKS_SZ(blks)               ((blks) * NFS_BLK_SZ())
+#define NFS_BLKS_SZ(blks)               ((blks) * NFS_BLK_SZ())                         //计算多少逻辑块的大小
 
 /* 取整函数 */
 #define NFS_ROUND_DOWN(value, round)    ((value) % (round) == 0 ? (value) : ((value) / (round)) * (round))
@@ -103,7 +103,7 @@ struct nfs_inode
     struct nfs_dentry* dentry;                          /* 指向该inode的父dentry */
     struct nfs_dentry* dentrys;                         /* 指向该inode的所有子dentry */
     uint8_t*           data[NFS_DATA_PER_FILE];         /* 指向数据块的指针 */
-    uint8_t*           data1;         
+    uint8_t*           data1;                   
     int                dir_cnt;                         /* 如果是目录类型文件，下面有几个目录项 */
     int                block_allocted;                  /* 已分配数据块数量 */
 };  
@@ -115,7 +115,7 @@ struct nfs_dentry
     struct nfs_dentry* brother;                       /* 兄弟 */
     int                ino;
     struct nfs_inode*  inode;                         /* 指向inode */
-    NFS_FILE_TYPE      ftype;
+   NFS_FILE_TYPE      ftype;
 };
 
 struct nfs_super

@@ -198,7 +198,7 @@ struct nfs_inode* nfs_alloc_inode(struct nfs_dentry * dentry) {
  * @brief 额外分配一个数据块
  * @return 分配的数据块号
  */
- int nfs_alloc_data() {
+int nfs_alloc_data() {
     int byte_cursor       = 0; 
     int bit_cursor        = 0;   
     int dno_cursor        = 0; 
@@ -213,7 +213,7 @@ struct nfs_inode* nfs_alloc_inode(struct nfs_dentry * dentry) {
                 is_find_free_data = TRUE;
                 break;
             }
-            dno_cursor    ++;
+            dno_cursor++;
         }
         if (is_find_free_data) {
             break;
@@ -225,7 +225,7 @@ struct nfs_inode* nfs_alloc_inode(struct nfs_dentry * dentry) {
     }
 
     return dno_cursor;
- }
+}
 /**
  * @brief 将内存inode及其下方结构全部刷回磁盘
  * 
